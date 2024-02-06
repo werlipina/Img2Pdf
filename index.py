@@ -3,7 +3,7 @@ from datetime import datetime
 from PIL import Image
 
 if __name__ == "__main__":
-    # Check if Image and PDF folders exist, create them if not
+    # Check if Images and PDF folders exist, create them if not
     if not os.path.exists("Images"):
         os.makedirs("Images")
         print(f"Folder 'Images' created successfully.")
