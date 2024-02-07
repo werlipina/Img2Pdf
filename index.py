@@ -1,8 +1,10 @@
 import os
 from datetime import datetime
 from PIL import Image
+import threading, queue, time
+
 if __name__ == "__main__":
-    # Check if Images and PDF folders exist, create them if not
+    # Checks if "Images" and "PDF" folders exist, create them if not.
     if not os.path.exists("Images"):
         os.makedirs("Images")
         print(f"Folder 'Images' created successfully.")
@@ -10,8 +12,11 @@ if __name__ == "__main__":
         os.makedirs("PDF")
         print(f"Folder 'PDF' created successfully.")
 
-    ImageFolder = "Images" # Source Folder.
-    while True: # Added a loop which instead of stopping code execution, it will wait until you save JPG or PNG files to "Images" folder and press Enter.
+    # Source Folder.
+    ImageFolder = "Images"
+    
+    # Added a loop which instead of stopping code execution, it will wait until you save JPG or PNG files to "Images"
+    while True:
         if any([os.path.exists(os.path.join(ImageFolder, f)) for f in os.listdir(ImageFolder) if (f.endswith(".jpg") or f.endswith(".png"))]):
             break
         print("No image files found in 'Images' folder.")
@@ -20,14 +25,24 @@ if __name__ == "__main__":
     DirList = os.listdir(ImageFolder)
     DirList.sort()
 
-    num_images = len([f for f in DirList if (f.endswith(".jpg") or f.endswith(".png"))]) # <--- This is for counting the number of images wsing DirList.
+    # Counts the number of images inside source folder.
+    num_images = len([f for f in DirList if (f.endswith(".jpg") or f.endswith(".png"))])
 
     def Img2PDF(ImageFolder, PDFName=None):
         if not PDFName:
             current_datetime = datetime.now().strftime("%Y-%m-%d-%H%M%S")
-            # Updated PDF name to include number of images in parentheses
-            PDFName = f"PDF/{ImageFolder}_PDF_({num_images})_{current_datetime}.pdf" # Source Folder + _PDF_ + (Number of Images Converted) + Date and Time.
-
+            # Source Folder + _PDF_ + (Number of Images Converted) + Date and Time.
+            PDFName = f"PDF/{ImageFolder}_PDF_({num_images})_{current_datetime}.pdf"
         image = [Image.open(f"{ImageFolder}/" + str(f)) for f in DirList]
-        image[0].save(PDFName, "PDF", resolution=100.0, save_all=True, append_images=image[1:])
-    Img2PDF(ImageFolder) # PDFName set as None by default here; the function will create a custom name automatically using source folder name and image count for uniqueness...
+        
+        thread_convert = threading.Thread(target=lambda: image[0].save(PDFName, "PDF", resolution=100.0, save_all=True, append_images=image[1:]))
+        # Start recording the time
+        start_time = time.perf_counter()
+        thread_convert.start()
+        # Wait until the conversion finishes
+        thread_convert.join() 
+        end_time = time.perf_counter()
+        # This shows the time taken to convert the images. (maximum of two decimal places for more readable results.)
+        print(f"Time taken to convert: {round(end_time - start_time, 2)} seconds.")
+        
+    Img2PDF(ImageFolder)
