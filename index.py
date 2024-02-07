@@ -4,15 +4,15 @@ from PIL import Image
 import threading, queue, time
 
 if __name__ == "__main__":
-
+    
     # PDF Folder Path.
-    PDF_Folder = "PDF"
+    PDF_Folder = "PDFs"
     # Source Folder.
     ImageFolder = "Images"
 
     # Checks if 'ImageFolder' and specified 'PDF_Folder'  exist, create them if not.
-    if not os.path.exists('{ImageFolder}'):
-        os.makedirs('{ImageFolder}')
+    if not os.path.exists(ImageFolder):
+        os.makedirs(ImageFolder)
         print(f"Folder '{ImageFolder}' created successfully.")
     if not os.path.exists(PDF_Folder):
         os.makedirs(PDF_Folder)
@@ -22,7 +22,7 @@ if __name__ == "__main__":
     while True:
         if any([os.path.exists(os.path.join(ImageFolder, f)) for f in os.listdir(ImageFolder) if (f.endswith(".jpg") or f.endswith(".png"))]):
             break
-        print("No image files found in '{ImageFolder}' folder.")
+        print(f"No image files found in '{ImageFolder}' folder.")
         print("When you're ready, press Enter to continue.")
         input()
     DirList = os.listdir(ImageFolder)
